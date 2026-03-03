@@ -1,0 +1,24 @@
+{
+  "name": "Garage Central",
+  "address": "123 Boulevard Hassan II, Casablanca",
+  "telephone": "0612345678",
+  "email": "contact@garagecentral.ma",
+  "openingTimes": {
+    "1": [
+      {
+        "startTime": "08:00",
+        "endTime": "12:00"
+      },
+      {
+        "startTime": "14:00",
+        "endTime": "18:00"
+      }
+    ],
+    "2": [
+      {
+        "startTime": "08:30",
+        "endTime": "17:30"
+      }
+    ]
+  }
+}

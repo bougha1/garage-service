@@ -25,14 +25,6 @@ public class Garage {
     @Column(nullable = false)
     private String email;
 
-    public List<OpeningTime> getOpeningTimes() {
-        return openingTimes;
-    }
-
-    public void setOpeningTimes(List<OpeningTime> openingTimes) {
-        this.openingTimes = openingTimes;
-    }
-
     @ElementCollection
     @CollectionTable(
             name = "garage_opening_times",
@@ -44,6 +36,14 @@ public class Garage {
             orphanRemoval = true
     )
     private List<OpeningTime> openingTimes = new ArrayList<>();
+
+    public List<OpeningTime> getOpeningTimes() {
+        return openingTimes;
+    }
+
+    public void setOpeningTimes(List<OpeningTime> openingTimes) {
+        this.openingTimes = openingTimes;
+    }
 
     @OneToMany(
             mappedBy = "garage",
