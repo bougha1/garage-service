@@ -1,6 +1,7 @@
 package com.renault.garage.controller;
 
 import com.renault.garage.dto.vehicle.*;
+import com.renault.garage.enums.FuelType;
 import com.renault.garage.services.VehicleService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/vehicles")
+@RequestMapping("/api/v1/vehicles")
 public class VehicleController {
 
     private final VehicleService vehicleService;
@@ -37,6 +38,11 @@ public class VehicleController {
         vehicleService.deleteVehicle(id);
     }
 
+    @GetMapping
+    public List<VehicleResponseDTO> getAllVehicles() {
+        return vehicleService.getAllVehicles();
+    }
+
     @GetMapping("/{id}")
     public VehicleResponseDTO getVehicle(@PathVariable UUID id) {
         return vehicleService.getVehicleById(id);
@@ -46,6 +52,13 @@ public class VehicleController {
     public List<VehicleResponseDTO> getVehiclesByGarage(@PathVariable UUID garageId) {
         return vehicleService.getVehiclesByGarage(garageId);
     }
+
+
+    @GetMapping("/by-fuel")
+    public List<VehicleResponseDTO> getVehiclesByFuelType(@RequestParam FuelType fuelType) {
+        return vehicleService.getVehiclesByFuelType(fuelType);
+    }
+
 
     @GetMapping("/by-model")
     public List<VehicleResponseDTO> getVehiclesByModel(@RequestParam String model) {

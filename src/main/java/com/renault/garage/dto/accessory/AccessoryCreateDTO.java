@@ -4,6 +4,7 @@ import com.renault.garage.enums.AccessoryType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class AccessoryCreateDTO {
@@ -14,7 +15,7 @@ public class AccessoryCreateDTO {
     private String description;
 
     @NotNull
-    private Double price;
+    private BigDecimal price;
 
     @NotNull
     private AccessoryType type;
@@ -38,11 +39,11 @@ public class AccessoryCreateDTO {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

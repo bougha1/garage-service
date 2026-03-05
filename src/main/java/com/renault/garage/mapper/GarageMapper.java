@@ -9,6 +9,7 @@ import org.mapstruct.*;
 
 import java.time.DayOfWeek;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -19,53 +20,70 @@ public interface GarageMapper {
     // CREATE
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "vehicles", ignore = true)
-    @Mapping(target = "openingTimes", ignore = true)
-    Garage toEntity(GarageCreateDTO dto);
+    @Mapping(target = "openingTimes", expression = "java(flattenOpeningMap(dto.getOpeningTimes(), openingTimeMapper))")
+    Garage toEntity(GarageCreateDTO dto, @Context OpeningTimeMapper openingTimeMapper);
+
+
+    default List<OpeningTime> flattenOpeningMap(Map<DayOfWeek, List<OpeningTimeDTO>> map,
+                                                OpeningTimeMapper openingTimeMapper) {
+        if (map == null || map.isEmpty()) return new ArrayList<>();
+        List<OpeningTime> list = new ArrayList<>();
+        map.forEach((day, slots) -> {
+            if (slots != null) {
+                for (OpeningTimeDTO slot : slots) {
+                    OpeningTime ot = openingTimeMapper.toEntityWithDay(slot, day);
+                    if (ot != null) list.add(ot);
+                }
+            }
+        });
+        return list;
+    }
+
+    @AfterMapping
+    default void linkChildren(@MappingTarget Garage garage) {
+        if (garage.getOpeningTimes() != null) {
+            garage.getOpeningTimes().forEach(ot -> ot.setGarage(garage));
+        }
+    }
+
+
 
     // READ
-    @Mapping(target = "openingTimes", ignore = true)
-    GarageResponseDTO toResponseDTO(Garage garage);
+    @Mapping(target = "openingTimes", expression = "java(groupOpeningMap(garage.getOpeningTimes(), openingTimeMapper))")
+    GarageResponseDTO toResponseDTO(Garage garage, @Context OpeningTimeMapper openingTimeMapper);
 
-    // UPDATE
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "vehicles", ignore = true)
-    @Mapping(target = "openingTimes", ignore = true)
-    void updateEntityFromDTO(GarageCreateDTO dto,
-                             @MappingTarget Garage entity);
 
-    default List<OpeningTime> mapOpeningTimes(
-            Map<DayOfWeek, List<OpeningTimeDTO>> dtoMap,
-            Garage garage
-    ) {
-        List<OpeningTime> result = new ArrayList<>();
-
-        if (dtoMap == null) return result;
-
-        dtoMap.forEach((day, times) -> {
-            times.forEach(t -> {
-                OpeningTime ot = new OpeningTime();
-                ot.setDayOfWeek(day);
-                ot.setStartTime(t.getStartTime());
-                ot.setEndTime(t.getEndTime());
-                ot.setGarage(garage);
-                result.add(ot);
-            });
-        });
-        return result;
-    }
-
-    default Map<DayOfWeek, List<OpeningTimeDTO>> mapOpeningTimesToDTO(
-            List<OpeningTime> entities
-    ) {
-        return entities.stream()
+    default Map<DayOfWeek, List<OpeningTimeDTO>> groupOpeningMap(List<OpeningTime> list,
+                                                                 OpeningTimeMapper openingTimeMapper) {
+        if (list == null || list.isEmpty()) return Collections.emptyMap();
+        return list.stream()
                 .collect(Collectors.groupingBy(
                         OpeningTime::getDayOfWeek,
-                        Collectors.mapping(ot -> {
-                            OpeningTimeDTO dto = new OpeningTimeDTO();
-                            dto.setStartTime(ot.getStartTime());
-                            dto.setEndTime(ot.getEndTime());
-                            return dto;
-                        }, Collectors.toList())
+                        Collectors.mapping(openingTimeMapper::toDTO, Collectors.toList())
                 ));
     }
+
+
+    // UPDATE
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "vehicles", ignore = true)
+    @Mapping(target = "openingTimes", ignore = true) // on gère nous-mêmes
+    void updateEntityFromDTO(GarageCreateDTO dto, @MappingTarget Garage entity);
+
+    // Remplacement complet de la liste à partir de la map (PUT)
+    default void replaceOpeningTimes(Garage entity,
+                                     Map<DayOfWeek, List<OpeningTimeDTO>> map,
+                                     OpeningTimeMapper openingTimeMapper) {
+        entity.getOpeningTimes().clear(); // orphanRemoval = true => suppression propre
+        if (map != null) {
+            List<OpeningTime> newOnes = flattenOpeningMap(map, openingTimeMapper);
+            for (OpeningTime ot : newOnes) {
+                ot.setGarage(entity); // back-reference
+            }
+            entity.getOpeningTimes().addAll(newOnes);
+        }
+    }
+
 }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/accessories")
+@RequestMapping("/api/v1/accessories")
 public class AccessoryController {
 
     private final AccessoryService accessoryService;

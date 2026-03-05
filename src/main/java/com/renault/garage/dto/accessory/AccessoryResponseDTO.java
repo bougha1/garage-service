@@ -2,6 +2,7 @@ package com.renault.garage.dto.accessory;
 
 import com.renault.garage.enums.AccessoryType;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public class AccessoryResponseDTO {
@@ -9,7 +10,8 @@ public class AccessoryResponseDTO {
     private UUID id;
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
+    private UUID vehicleId;
     private AccessoryType type;
 
     public UUID getId() {
@@ -36,11 +38,11 @@ public class AccessoryResponseDTO {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -50,5 +52,13 @@ public class AccessoryResponseDTO {
 
     public void setType(AccessoryType type) {
         this.type = type;
+    }
+
+    public UUID getVehicleId() {
+        return vehicleId;
+    }
+
+    public void setVehicleId(UUID vehicleId) {
+        this.vehicleId = vehicleId;
     }
 }

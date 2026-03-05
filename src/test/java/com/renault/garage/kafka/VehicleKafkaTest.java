@@ -29,7 +29,8 @@ class VehicleKafkaTest {
                 UUID.randomUUID(),
                 UUID.randomUUID(),
                 "Renault",
-                "Clio"
+                "Clio",
+                2024
         );
 
         producer.sendVehicleCreatedEvent(event);

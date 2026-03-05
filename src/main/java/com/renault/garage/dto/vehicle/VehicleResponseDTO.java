@@ -1,5 +1,6 @@
 package com.renault.garage.dto.vehicle;
 
+import com.renault.garage.entity.Garage;
 import com.renault.garage.enums.FuelType;
 
 import java.util.UUID;
@@ -9,7 +10,7 @@ public class VehicleResponseDTO {
     private UUID id;
     private String brand;
     private String model;
-    private Integer year;
+    private int manufactureYear;
     private FuelType fuelType;
 
     public UUID getId() {
@@ -36,12 +37,12 @@ public class VehicleResponseDTO {
         this.model = model;
     }
 
-    public Integer getYear() {
-        return year;
+    public int getManufactureYear() {
+        return manufactureYear;
     }
 
-    public void setYear(Integer year) {
-        this.year = year;
+    public void setManufactureYear(int year) {
+        this.manufactureYear = year;
     }
 
     public FuelType getFuelType() {
@@ -51,4 +52,5 @@ public class VehicleResponseDTO {
     public void setFuelType(FuelType fuelType) {
         this.fuelType = fuelType;
     }
+
 }

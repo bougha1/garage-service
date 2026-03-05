@@ -2,8 +2,10 @@ package com.renault.garage.service.impl;
 
 import com.renault.garage.dto.vehicle.VehicleCreateDTO;
 import com.renault.garage.dto.vehicle.VehicleResponseDTO;
+import com.renault.garage.entity.Accessory;
 import com.renault.garage.entity.Garage;
 import com.renault.garage.entity.Vehicle;
+import com.renault.garage.enums.FuelType;
 import com.renault.garage.exception.NotFoundException;
 import com.renault.garage.exception.QuotaExceededException;
 import com.renault.garage.kafka.event.VehicleCreatedEvent;
@@ -54,18 +56,19 @@ public class VehicleServiceImpl implements VehicleService {
 
         Vehicle vehicle = vehicleMapper.toEntity(dto);
         vehicle.setGarage(garage);
-        vehicleRepository.save(vehicle);
+        Vehicle saved = vehicleRepository.save(vehicle);
 
         //Publier l'événement
         VehicleCreatedEvent event = new VehicleCreatedEvent(
                 vehicle.getId(),
                 garage.getId(),
                 vehicle.getBrand(),
-                vehicle.getModel()
+                vehicle.getModel(),
+                vehicle.getManufactureYear()
         );
-        vehicleProducer.sendVehicleCreatedEvent(event);
+       vehicleProducer.sendVehicleCreatedEvent(event);
 
-        return vehicleMapper.toResponseDTO(vehicle);
+       return vehicleMapper.toResponseDTO(saved);
     }
 
     @Override
@@ -106,6 +109,22 @@ public class VehicleServiceImpl implements VehicleService {
     @Override
     public List<VehicleResponseDTO> getVehiclesByModel(String model) {
         return vehicleRepository.findByModel(model)
+                .stream()
+                .map(vehicleMapper::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    public List<VehicleResponseDTO> getAllVehicles() {
+        return vehicleRepository.findAll()
+                .stream()
+                .map(vehicleMapper::toResponseDTO)
+                .toList();
+    }
+
+    @Override
+    public List<VehicleResponseDTO> getVehiclesByFuelType(FuelType fuelType) {
+        return vehicleRepository.findByFuelType(fuelType)
                 .stream()
                 .map(vehicleMapper::toResponseDTO)
                 .toList();

@@ -7,15 +7,18 @@ public class VehicleCreatedEvent {
     private UUID garageId;
     private String brand;
     private String model;
+    private int manufactureYear;
 
     public VehicleCreatedEvent() {}
 
-    public VehicleCreatedEvent(UUID vehicleId, UUID garageId, String brand, String model) {
+    public VehicleCreatedEvent(UUID vehicleId, UUID garageId, String brand, String model, int manufactureYear) {
         this.vehicleId = vehicleId;
         this.garageId = garageId;
         this.brand = brand;
         this.model = model;
+        this.manufactureYear = manufactureYear;
     }
+
 
     public UUID getVehicleId() {
         return vehicleId;
@@ -47,5 +50,13 @@ public class VehicleCreatedEvent {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public int getManufactureYear() {
+        return manufactureYear;
+    }
+
+    public void setManufactureYear(int manufactureYear) {
+        this.manufactureYear = manufactureYear;
     }
 }

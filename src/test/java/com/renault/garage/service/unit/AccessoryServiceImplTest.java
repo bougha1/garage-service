@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,72 +48,152 @@ class AccessoryServiceImplTest {
 
     @Test
     void testCreateAccessory_Success() {
+
+        UUID vehicleId = UUID.randomUUID();
+
+        // DTO
         AccessoryCreateDTO dto = new AccessoryCreateDTO();
-        dto.setVehicleId(vehicle.getId());
+        dto.setVehicleId(vehicleId);
         dto.setName("GPS");
         dto.setDescription("Navigation GPS");
-        dto.setPrice(150.0);
+        dto.setPrice(BigDecimal.valueOf(150.0));
         dto.setType(AccessoryType.SECURITY);
 
-        Accessory accessory = new Accessory();
-        accessory.setId(UUID.randomUUID());
+        // Vehicle
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(vehicleId);
 
+        // Entity created by mapper
+        Accessory mappedEntity = new Accessory();
+        mappedEntity.setName("GPS");
+        mappedEntity.setPrice(BigDecimal.valueOf(150.0));
+        mappedEntity.setType(AccessoryType.SECURITY);
+
+        // Entity after save
+        Accessory saved = new Accessory();
+        saved.setId(UUID.randomUUID());
+        saved.setName("GPS");
+        saved.setPrice(BigDecimal.valueOf(150.0));
+        saved.setType(AccessoryType.SECURITY);
+        saved.setVehicle(vehicle);
+
+        // Response DTO
         AccessoryResponseDTO responseDTO = new AccessoryResponseDTO();
-        responseDTO.setId(accessory.getId());
+        responseDTO.setId(saved.getId());
         responseDTO.setName("GPS");
+        responseDTO.setPrice(saved.getPrice());
+        responseDTO.setType(saved.getType());
+        responseDTO.setVehicleId(vehicle.getId());
 
-        when(vehicleRepository.findById(vehicle.getId())).thenReturn(Optional.of(vehicle));
-        when(accessoryMapper.toEntity(dto)).thenReturn(accessory);
-        when(accessoryRepository.save(accessory)).thenReturn(accessory);
-        when(accessoryMapper.toResponseDTO(accessory)).thenReturn(responseDTO);
+        // Mocks
+        when(vehicleRepository.findById(vehicleId))
+                .thenReturn(Optional.of(vehicle));
 
+        when(accessoryMapper.toEntity(dto))
+                .thenReturn(mappedEntity);
+
+        when(accessoryRepository.save(mappedEntity))
+                .thenReturn(saved);
+
+        when(accessoryMapper.toResponseDTO(saved))
+                .thenReturn(responseDTO);
+
+        // Act
         AccessoryResponseDTO result = accessoryService.createAccessory(dto);
 
+        // Assert
         assertNotNull(result);
         assertEquals("GPS", result.getName());
-        verify(accessoryRepository, times(1)).save(accessory);
+        assertEquals(saved.getId(), result.getId());
+        assertEquals(vehicleId, result.getVehicleId());
+
+        verify(accessoryMapper).toEntity(dto);
+        verify(accessoryRepository).save(mappedEntity);
+        verify(accessoryMapper).toResponseDTO(saved);
     }
 
     @Test
     void testUpdateAccessory_Success() {
-        UUID accessoryId = UUID.randomUUID();
-        Accessory accessory = new Accessory();
-        accessory.setId(accessoryId);
-        accessory.setVehicle(vehicle);
 
+        UUID accessoryId = UUID.randomUUID();
+        UUID vehicleId = UUID.randomUUID();
+
+        // DTO pour mise à jour
         AccessoryCreateDTO dto = new AccessoryCreateDTO();
-        dto.setVehicleId(vehicle.getId());
-        dto.setName("GPS Updated");
-        dto.setDescription("Updated Navigation GPS");
-        dto.setPrice(160.0);
+        dto.setVehicleId(vehicleId);
+        dto.setName("Updated GPS");
+        dto.setDescription("Updated desc");
+        dto.setPrice(BigDecimal.valueOf(200.0));
         dto.setType(AccessoryType.SECURITY);
 
+        // Accessory existant
+        Accessory existing = new Accessory();
+        existing.setId(accessoryId);
+        existing.setName("Old GPS");
+
+        // Nouveau véhicule
+        Vehicle vehicle = new Vehicle();
+        vehicle.setId(vehicleId);
+
+        // Accessory sauvegardé
+        Accessory saved = new Accessory();
+        saved.setId(accessoryId);
+        saved.setName("Updated GPS");
+        saved.setPrice(dto.getPrice());
+        saved.setType(dto.getType());
+        saved.setVehicle(vehicle);
+
+        // Réponse DTO
         AccessoryResponseDTO responseDTO = new AccessoryResponseDTO();
         responseDTO.setId(accessoryId);
-        responseDTO.setName("GPS Updated");
+        responseDTO.setName("Updated GPS");
+        responseDTO.setPrice(dto.getPrice());
+        responseDTO.setVehicleId(vehicleId);
 
-        when(accessoryRepository.findById(accessoryId)).thenReturn(Optional.of(accessory));
-        doNothing().when(accessoryMapper).updateEntityFromDTO(dto, accessory);
-        when(accessoryRepository.save(accessory)).thenReturn(accessory);
-        when(accessoryMapper.toResponseDTO(accessory)).thenReturn(responseDTO);
+        // Mocks
+        when(accessoryRepository.findById(accessoryId))
+                .thenReturn(Optional.of(existing));
 
+        when(vehicleRepository.findById(vehicleId))
+                .thenReturn(Optional.of(vehicle));
+
+        // updateEntityFromDTO() modifies existing → no return required
+        doNothing().when(accessoryMapper).updateEntityFromDTO(dto, existing);
+
+        when(accessoryRepository.save(existing))
+                .thenReturn(saved);
+
+        when(accessoryMapper.toResponseDTO(saved))
+                .thenReturn(responseDTO);
+
+        // Act
         AccessoryResponseDTO result = accessoryService.updateAccessory(accessoryId, dto);
 
-        assertEquals("GPS Updated", result.getName());
-        verify(accessoryRepository, times(1)).save(accessory);
+        // Assert
+        assertNotNull(result);
+        assertEquals("Updated GPS", result.getName());
+        assertEquals(accessoryId, result.getId());
+
+        verify(accessoryRepository).findById(accessoryId);
+        verify(vehicleRepository).findById(vehicleId);
+        verify(accessoryMapper).updateEntityFromDTO(dto, existing);
+        verify(accessoryRepository).save(existing);
+        verify(accessoryMapper).toResponseDTO(saved);
     }
 
     @Test
     void testDeleteAccessory() {
+
         UUID accessoryId = UUID.randomUUID();
-        Accessory accessory = new Accessory();
-        accessory.setId(accessoryId);
 
-        when(accessoryRepository.findById(accessoryId)).thenReturn(Optional.of(accessory));
+        when(accessoryRepository.existsById(accessoryId)).thenReturn(true);
 
+        // Act
         accessoryService.deleteAccessory(accessoryId);
 
-        verify(accessoryRepository).delete(accessory);
+        // Assert
+        verify(accessoryRepository).existsById(accessoryId);
+        verify(accessoryRepository).deleteById(accessoryId);
     }
 
     @Test

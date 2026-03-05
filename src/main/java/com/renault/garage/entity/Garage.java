@@ -25,15 +25,11 @@ public class Garage {
     @Column(nullable = false)
     private String email;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "garage_opening_times",
-            joinColumns = @JoinColumn(name = "garage_id")
-    )
     @OneToMany(
             mappedBy = "garage",
             cascade = CascadeType.ALL,
-            orphanRemoval = true
+            orphanRemoval = true,
+            fetch = FetchType.LAZY
     )
     private List<OpeningTime> openingTimes = new ArrayList<>();
 

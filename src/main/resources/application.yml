@@ -6,16 +6,21 @@ spring:
     name: garage-service
 
   datasource:
-    url: jdbc:h2:mem:garage-db
+    url: jdbc:h2:mem:garage-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
-    password: ""
+    password:
 
   jpa:
     hibernate:
       ddl-auto: create-drop
     show-sql: true
     open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
 
   h2:
     console:
@@ -23,13 +28,39 @@ spring:
       path: /h2-console
 
   kafka:
+    bootstrap-servers: localhost:9092
+
+    producer:
+      # sérialisation JSON des événements (ex: VehicleCreatedEvent)
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # ajoute des headers de type pour les consumers Spring (utile si tu n'utilises pas @KafkaListener avec target type)
+        spring.json.add.type.headers: true
+        # supprime les champs null
+        spring.json.write_dates_as_timestamps: false
+      acks: all
+      retries: 5
+      properties.linger.ms: 5
+      properties.delivery.timeout.ms: 120000
+
     consumer:
       group-id: garage-service
       auto-offset-reset: earliest
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      enable-auto-commit: true
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # IMPORTANT pour la désérialisation des DTO/Events
+        spring.json.trusted.packages: com.renault.garage.*,*
+        spring.json.use.type.headers: true
+        spring.json.value.default.type: com.renault.garage.kafka.event.VehicleCreatedEvent # <-- adapte si tu consommes un type précis
+
+    listener:
+      missing-topics-fatal: false
 
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs

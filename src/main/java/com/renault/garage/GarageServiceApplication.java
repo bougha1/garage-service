@@ -2,8 +2,9 @@ package com.renault.garage;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.renault.garage")
 public class GarageServiceApplication {
 
     public static void main(String[] args) {

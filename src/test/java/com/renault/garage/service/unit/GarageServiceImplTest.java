@@ -5,6 +5,7 @@ import com.renault.garage.dto.garage.GarageResponseDTO;
 import com.renault.garage.entity.Garage;
 import com.renault.garage.exception.NotFoundException;
 import com.renault.garage.mapper.GarageMapper;
+import com.renault.garage.mapper.OpeningTimeMapper;
 import com.renault.garage.repository.GarageRepository;
 import com.renault.garage.service.impl.GarageServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,9 @@ class GarageServiceImplTest {
 
     @Mock
     private GarageMapper garageMapper;
+
+    @Mock
+    private OpeningTimeMapper openingTimeMapper;
 
     private Garage garage;
     private GarageCreateDTO garageCreateDTO;
@@ -52,25 +56,42 @@ class GarageServiceImplTest {
 
     @Test
     void createGarage_ShouldReturnDTO() {
-        when(garageMapper.toEntity(garageCreateDTO)).thenReturn(garage);
+
+        // Mock mapper: toEntity(dto, openingTimeMapper)
+        when(garageMapper.toEntity(eq(garageCreateDTO), eq(openingTimeMapper)))
+                .thenReturn(garage);
+
+        // Mock repository
         when(garageRepository.save(garage)).thenReturn(garage);
-        when(garageMapper.toResponseDTO(garage)).thenReturn(new GarageResponseDTO());
+
+        // Mock mapper: toResponseDTO(garage, openingTimeMapper)
+        when(garageMapper.toResponseDTO(eq(garage), eq(openingTimeMapper)))
+                .thenReturn(new GarageResponseDTO());
 
         GarageResponseDTO result = garageService.createGarage(garageCreateDTO);
 
         assertNotNull(result);
+
+        verify(garageMapper, times(1)).toEntity(garageCreateDTO, openingTimeMapper);
         verify(garageRepository, times(1)).save(garage);
+        verify(garageMapper, times(1)).toResponseDTO(garage, openingTimeMapper);
     }
 
     @Test
     void getGarageById_ShouldReturnGarage() {
-        when(garageRepository.findById(garage.getId())).thenReturn(Optional.of(garage));
-        when(garageMapper.toResponseDTO(garage)).thenReturn(new GarageResponseDTO());
+
+        when(garageRepository.findById(garage.getId()))
+                .thenReturn(Optional.of(garage));
+
+        when(garageMapper.toResponseDTO(eq(garage), eq(openingTimeMapper)))
+                .thenReturn(new GarageResponseDTO());
 
         GarageResponseDTO result = garageService.getGarageById(garage.getId());
 
         assertNotNull(result);
+
         verify(garageRepository, times(1)).findById(garage.getId());
+        verify(garageMapper, times(1)).toResponseDTO(garage, openingTimeMapper);
     }
 
     @Test

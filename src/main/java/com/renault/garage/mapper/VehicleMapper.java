@@ -12,6 +12,7 @@ public interface VehicleMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "garage", ignore = true)
     @Mapping(target = "accessories", ignore = true)
+    @Mapping(source = "manufactureYear", target = "manufactureYear")
     Vehicle toEntity(VehicleCreateDTO dto);
 
     // READ
