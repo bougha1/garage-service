@@ -5,6 +5,7 @@ import com.renault.garage.dto.vehicle.VehicleResponseDTO;
 import com.renault.garage.entity.Garage;
 import com.renault.garage.entity.Vehicle;
 import com.renault.garage.enums.FuelType;
+import com.renault.garage.kafka.producer.VehicleProducer;
 import com.renault.garage.repository.GarageRepository;
 import com.renault.garage.repository.VehicleRepository;
 import com.renault.garage.services.VehicleService;
@@ -12,12 +13,16 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -30,6 +35,8 @@ public class VehicleServiceIntegration {
     private VehicleRepository vehicleRepository;
     @Autowired
     private GarageRepository garageRepository;
+    @MockitoBean
+    private VehicleProducer vehicleProducer;
 
 
     private Garage createGarage() {
@@ -56,6 +63,7 @@ public class VehicleServiceIntegration {
         Garage garage = createGarage();
         VehicleCreateDTO dto = createVehicleDTO(garage.getId());
 
+        doNothing().when(vehicleProducer).sendVehicleCreatedEvent(any());
         VehicleResponseDTO response = vehicleService.createVehicle(dto);
 
         assertNotNull(response.getId());

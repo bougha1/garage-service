@@ -2,7 +2,6 @@ package com.renault.garage.entity;
 
 import jakarta.persistence.*;
 
-import java.time.DayOfWeek;
 import java.util.*;
 
 @Entity
@@ -37,16 +36,16 @@ public class Garage {
         return openingTimes;
     }
 
-    public void setOpeningTimes(List<OpeningTime> openingTimes) {
-        this.openingTimes = openingTimes;
-    }
-
     @OneToMany(
             mappedBy = "garage",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
     private List<Vehicle> vehicles = new ArrayList<>();
+
+    public void setOpeningTimes(List<OpeningTime> openingTimes) {
+        this.openingTimes = openingTimes;
+    }
 
     public UUID getId() {
         return id;

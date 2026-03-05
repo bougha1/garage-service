@@ -115,6 +115,8 @@ public class AccessoryServiceIntegration {
 
         Accessory accessory = new Accessory();
         accessory.setName("To Delete");
+        accessory.setPrice(BigDecimal.valueOf(100));
+        accessory.setType(AccessoryType.SECURITY);
         accessory.setVehicle(vehicle);
         accessory = accessoryRepository.save(accessory);
 

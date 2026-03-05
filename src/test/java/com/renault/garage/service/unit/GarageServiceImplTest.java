@@ -57,14 +57,11 @@ class GarageServiceImplTest {
     @Test
     void createGarage_ShouldReturnDTO() {
 
-        // Mock mapper: toEntity(dto, openingTimeMapper)
         when(garageMapper.toEntity(eq(garageCreateDTO), eq(openingTimeMapper)))
                 .thenReturn(garage);
 
-        // Mock repository
         when(garageRepository.save(garage)).thenReturn(garage);
 
-        // Mock mapper: toResponseDTO(garage, openingTimeMapper)
         when(garageMapper.toResponseDTO(eq(garage), eq(openingTimeMapper)))
                 .thenReturn(new GarageResponseDTO());
 

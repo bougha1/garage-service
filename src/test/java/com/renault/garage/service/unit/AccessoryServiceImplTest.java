@@ -3,7 +3,7 @@ package com.renault.garage.service.unit;
 import com.renault.garage.dto.accessory.AccessoryCreateDTO;
 import com.renault.garage.dto.accessory.AccessoryResponseDTO;
 import com.renault.garage.enums.AccessoryType;
-import com.renault.garage.services.impl.AccessoryServiceImpl;
+import com.renault.garage.service.impl.AccessoryServiceImpl;
 import com.renault.garage.entity.Accessory;
 import com.renault.garage.entity.Vehicle;
 import com.renault.garage.exception.NotFoundException;
@@ -51,7 +51,6 @@ class AccessoryServiceImplTest {
 
         UUID vehicleId = UUID.randomUUID();
 
-        // DTO
         AccessoryCreateDTO dto = new AccessoryCreateDTO();
         dto.setVehicleId(vehicleId);
         dto.setName("GPS");
@@ -59,17 +58,14 @@ class AccessoryServiceImplTest {
         dto.setPrice(BigDecimal.valueOf(150.0));
         dto.setType(AccessoryType.SECURITY);
 
-        // Vehicle
         Vehicle vehicle = new Vehicle();
         vehicle.setId(vehicleId);
 
-        // Entity created by mapper
         Accessory mappedEntity = new Accessory();
         mappedEntity.setName("GPS");
         mappedEntity.setPrice(BigDecimal.valueOf(150.0));
         mappedEntity.setType(AccessoryType.SECURITY);
 
-        // Entity after save
         Accessory saved = new Accessory();
         saved.setId(UUID.randomUUID());
         saved.setName("GPS");
@@ -77,7 +73,6 @@ class AccessoryServiceImplTest {
         saved.setType(AccessoryType.SECURITY);
         saved.setVehicle(vehicle);
 
-        // Response DTO
         AccessoryResponseDTO responseDTO = new AccessoryResponseDTO();
         responseDTO.setId(saved.getId());
         responseDTO.setName("GPS");
@@ -85,7 +80,6 @@ class AccessoryServiceImplTest {
         responseDTO.setType(saved.getType());
         responseDTO.setVehicleId(vehicle.getId());
 
-        // Mocks
         when(vehicleRepository.findById(vehicleId))
                 .thenReturn(Optional.of(vehicle));
 
@@ -98,10 +92,8 @@ class AccessoryServiceImplTest {
         when(accessoryMapper.toResponseDTO(saved))
                 .thenReturn(responseDTO);
 
-        // Act
         AccessoryResponseDTO result = accessoryService.createAccessory(dto);
 
-        // Assert
         assertNotNull(result);
         assertEquals("GPS", result.getName());
         assertEquals(saved.getId(), result.getId());
@@ -118,7 +110,6 @@ class AccessoryServiceImplTest {
         UUID accessoryId = UUID.randomUUID();
         UUID vehicleId = UUID.randomUUID();
 
-        // DTO pour mise à jour
         AccessoryCreateDTO dto = new AccessoryCreateDTO();
         dto.setVehicleId(vehicleId);
         dto.setName("Updated GPS");
@@ -126,16 +117,13 @@ class AccessoryServiceImplTest {
         dto.setPrice(BigDecimal.valueOf(200.0));
         dto.setType(AccessoryType.SECURITY);
 
-        // Accessory existant
         Accessory existing = new Accessory();
         existing.setId(accessoryId);
         existing.setName("Old GPS");
 
-        // Nouveau véhicule
         Vehicle vehicle = new Vehicle();
         vehicle.setId(vehicleId);
 
-        // Accessory sauvegardé
         Accessory saved = new Accessory();
         saved.setId(accessoryId);
         saved.setName("Updated GPS");
@@ -143,21 +131,18 @@ class AccessoryServiceImplTest {
         saved.setType(dto.getType());
         saved.setVehicle(vehicle);
 
-        // Réponse DTO
         AccessoryResponseDTO responseDTO = new AccessoryResponseDTO();
         responseDTO.setId(accessoryId);
         responseDTO.setName("Updated GPS");
         responseDTO.setPrice(dto.getPrice());
         responseDTO.setVehicleId(vehicleId);
 
-        // Mocks
         when(accessoryRepository.findById(accessoryId))
                 .thenReturn(Optional.of(existing));
 
         when(vehicleRepository.findById(vehicleId))
                 .thenReturn(Optional.of(vehicle));
 
-        // updateEntityFromDTO() modifies existing → no return required
         doNothing().when(accessoryMapper).updateEntityFromDTO(dto, existing);
 
         when(accessoryRepository.save(existing))
@@ -166,10 +151,8 @@ class AccessoryServiceImplTest {
         when(accessoryMapper.toResponseDTO(saved))
                 .thenReturn(responseDTO);
 
-        // Act
         AccessoryResponseDTO result = accessoryService.updateAccessory(accessoryId, dto);
 
-        // Assert
         assertNotNull(result);
         assertEquals("Updated GPS", result.getName());
         assertEquals(accessoryId, result.getId());
@@ -188,10 +171,8 @@ class AccessoryServiceImplTest {
 
         when(accessoryRepository.existsById(accessoryId)).thenReturn(true);
 
-        // Act
         accessoryService.deleteAccessory(accessoryId);
 
-        // Assert
         verify(accessoryRepository).existsById(accessoryId);
         verify(accessoryRepository).deleteById(accessoryId);
     }

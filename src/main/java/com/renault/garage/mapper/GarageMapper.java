@@ -17,12 +17,10 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring", uses = {OpeningTimeMapper.class})
 public interface GarageMapper {
 
-    // CREATE
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "vehicles", ignore = true)
     @Mapping(target = "openingTimes", expression = "java(flattenOpeningMap(dto.getOpeningTimes(), openingTimeMapper))")
     Garage toEntity(GarageCreateDTO dto, @Context OpeningTimeMapper openingTimeMapper);
-
 
     default List<OpeningTime> flattenOpeningMap(Map<DayOfWeek, List<OpeningTimeDTO>> map,
                                                 OpeningTimeMapper openingTimeMapper) {
@@ -46,12 +44,8 @@ public interface GarageMapper {
         }
     }
 
-
-
-    // READ
     @Mapping(target = "openingTimes", expression = "java(groupOpeningMap(garage.getOpeningTimes(), openingTimeMapper))")
     GarageResponseDTO toResponseDTO(Garage garage, @Context OpeningTimeMapper openingTimeMapper);
-
 
     default Map<DayOfWeek, List<OpeningTimeDTO>> groupOpeningMap(List<OpeningTime> list,
                                                                  OpeningTimeMapper openingTimeMapper) {
@@ -63,16 +57,12 @@ public interface GarageMapper {
                 ));
     }
 
-
-    // UPDATE
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "vehicles", ignore = true)
     @Mapping(target = "openingTimes", ignore = true) // on gère nous-mêmes
     void updateEntityFromDTO(GarageCreateDTO dto, @MappingTarget Garage entity);
 
-    // Remplacement complet de la liste à partir de la map (PUT)
     default void replaceOpeningTimes(Garage entity,
                                      Map<DayOfWeek, List<OpeningTimeDTO>> map,
                                      OpeningTimeMapper openingTimeMapper) {

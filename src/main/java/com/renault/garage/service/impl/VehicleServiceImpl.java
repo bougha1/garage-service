@@ -2,7 +2,6 @@ package com.renault.garage.service.impl;
 
 import com.renault.garage.dto.vehicle.VehicleCreateDTO;
 import com.renault.garage.dto.vehicle.VehicleResponseDTO;
-import com.renault.garage.entity.Accessory;
 import com.renault.garage.entity.Garage;
 import com.renault.garage.entity.Vehicle;
 import com.renault.garage.enums.FuelType;
@@ -15,7 +14,6 @@ import com.renault.garage.repository.GarageRepository;
 import com.renault.garage.repository.VehicleRepository;
 import com.renault.garage.services.VehicleService;
 import jakarta.transaction.Transactional;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.renault.garage.services.impl;
+package com.renault.garage.service.impl;
 
 import com.renault.garage.dto.accessory.AccessoryCreateDTO;
 import com.renault.garage.dto.accessory.AccessoryResponseDTO;

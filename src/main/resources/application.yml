@@ -31,13 +31,10 @@ spring:
     bootstrap-servers: localhost:9092
 
     producer:
-      # sérialisation JSON des événements (ex: VehicleCreatedEvent)
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       properties:
-        # ajoute des headers de type pour les consumers Spring (utile si tu n'utilises pas @KafkaListener avec target type)
         spring.json.add.type.headers: true
-        # supprime les champs null
         spring.json.write_dates_as_timestamps: false
       acks: all
       retries: 5
@@ -51,7 +48,6 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
       properties:
-        # IMPORTANT pour la désérialisation des DTO/Events
         spring.json.trusted.packages: com.renault.garage.*,*
         spring.json.use.type.headers: true
         spring.json.value.default.type: com.renault.garage.kafka.event.VehicleCreatedEvent # <-- adapte si tu consommes un type précis
