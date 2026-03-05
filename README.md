@@ -30,7 +30,8 @@ ou lancer la classe GarageServiceApplication.java
 
 Dans le repertoire : C:\kafka_2.13-3.6.0\ lance les commandes suivant :
 
-- Zookeeper : .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
+- Zookeeper :
+              .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
 
 - Kafka : 
               $env:KAFKA_HEAP_OPTS = "-Xms512m -Xmx512m"
