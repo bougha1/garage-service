@@ -28,7 +28,11 @@ ou lancer la classe GarageServiceApplication.java
 ---------------------------------------------------------------------------------------------------------------------------------------------
                                 Commandes Kafka & Zookeeper (Windows PowerShell)
 
-Dans le repertoire : C:\kafka_2.13-3.6.0\ lance les commandes suivant :
+Dans le repertoire : C:\kafka_2.13-3.8.1\ télécharger depuis https://kafka.apache.org/community/downloads/#282 
+
+<img width="494" height="260" alt="image" src="https://github.com/user-attachments/assets/77ab9891-fdf9-42d3-b208-cfc25124260b" />
+
+Lancer les commandes suivant :
 
 - Zookeeper :
               .\bin\windows\zookeeper-server-start.bat .\config\zookeeper.properties
