@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Transactional
 public class GarageServiceImpl implements GarageService {
 
     private final GarageRepository garageRepository;

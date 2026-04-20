@@ -6,7 +6,7 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public abstract class VehicleConsumer {
+public class VehicleConsumer {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -22,6 +22,4 @@ public abstract class VehicleConsumer {
             throw new RuntimeException("Kafka deserialization error", e);
         }
     }
-
-    public abstract void consumeVehicleEvent(VehicleCreatedEvent event);
 }

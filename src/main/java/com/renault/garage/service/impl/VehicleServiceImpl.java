@@ -98,8 +98,13 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public List<VehicleResponseDTO> getVehiclesByGarage(UUID garageId) {
-        return vehicleRepository.findByGarageId(garageId)
-                .stream()
+        List<Vehicle> vehicles = vehicleRepository.findByGarageId(garageId);
+
+        if(vehicles.isEmpty()) {
+            throw new NotFoundException("Garage not found with id: " + garageId);
+        }
+
+        return vehicles.stream()
                 .map(vehicleMapper::toResponseDTO)
                 .toList();
     }
@@ -122,10 +127,18 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public List<VehicleResponseDTO> getVehiclesByFuelType(FuelType fuelType) {
-        return vehicleRepository.findByFuelType(fuelType)
-                .stream()
+        List<Vehicle> vehicles = vehicleRepository.findByFuelType(fuelType);
+
+        if (vehicles.isEmpty()) {
+            throw new NotFoundException(
+                    "No vehicle with fuel type " + fuelType + " found in this garage"
+            );
+        }
+
+        return vehicles.stream()
                 .map(vehicleMapper::toResponseDTO)
                 .toList();
+
     }
 
     private Garage checkQuotaAndGetGarage(UUID garageId) {

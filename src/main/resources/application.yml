@@ -50,7 +50,7 @@ spring:
       properties:
         spring.json.trusted.packages: com.renault.garage.*,*
         spring.json.use.type.headers: true
-        spring.json.value.default.type: com.renault.garage.kafka.event.VehicleCreatedEvent # <-- adapte si tu consommes un type précis
+        spring.json.value.default.type: com.renault.garage.kafka.event.VehicleCreatedEvent
 
     listener:
       missing-topics-fatal: false

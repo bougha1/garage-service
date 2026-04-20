@@ -77,9 +77,13 @@ public class AccessoryServiceImpl implements AccessoryService {
 
     @Override
     public List<AccessoryResponseDTO> getAccessoriesByVehicle(UUID vehicleId) {
+        List<Accessory> accessories = accessoryRepository.findByVehicleId(vehicleId);
 
-        return accessoryRepository.findByVehicleId(vehicleId)
-                .stream()
+        if(accessories.isEmpty()) {
+            throw new NotFoundException("Accessory not found with vehicle id " + vehicleId);
+        }
+
+        return accessories.stream()
                 .map(accessoryMapper::toResponseDTO)
                 .toList();
     }
